@@ -10,5 +10,7 @@ rsconnect::setAccountInfo(name=project,
 To update use: 
 rsconnect::deployApp('vol.Rmd')
 
-For more details see: [shinyapps docs](https://docs.rstudio.com/shinyapps.io/getting-started.html)
+For more details see: [shinyapps docs](https://docs.rstudio.com/shinyapps.io/index.html)
+
+[Original repository - dgrtwo/data-screencasts/volcano-eruptions.Rmd](https://github.com/dgrtwo/data-screencasts/blob/master/volcano-eruptions.Rmd)
 

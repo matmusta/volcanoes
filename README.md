@@ -10,3 +10,5 @@ rsconnect::setAccountInfo(name=project,
 To update use: 
 rsconnect::deployApp('vol.Rmd')
 
+For more details see: https://www.shinyapps.io/
+

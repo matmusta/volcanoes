@@ -1,0 +1,168 @@
+---
+title: "Volcanoes"
+author: ""
+date: "`r Sys.time()`"
+output: flexdashboard::flex_dashboard
+runtime: shiny
+---
+```{r setup, include=FALSE}
+options(scipen = 999999)
+knitr::opts_chunk$set(echo = F, warning = F, message = F)
+settings <- list()
+settings$packages <- list("tidyverse", "animation", "factoextra", "cluster",
+                          "lubridate", "plotly", "shiny",
+                          "shinyWidgets")
+lapply(settings$packages, library, character.only = TRUE)
+theme_set(theme_light())
+```
+
+```{r set, include=F}
+tuesdata <- tidytuesdayR::tt_load('2020-05-12')
+
+volcano <- tuesdata$volcano %>%
+  mutate(last_eruption_year = as.numeric(last_eruption_year))
+
+eruptions <- tuesdata$eruptions
+```
+
+Introduction {data-icon="fa-atlas"}
+=====================================     
+
+Column 4{data-width=150}
+-------------------------------------
+
+<font color = "#808080">
+Original repository: [data-screencasts](https://github.com/dgrtwo/data-screencasts.git)
+<br>
+<br>
+Modified repository:
+[volcano repository](https://bitbucket.roche.com/stash/projects/BIIS_AA/repos/validated-error-model/)
+</font>
+
+
+```{r select 1}
+
+pickerInput("evidence","Evidence", 
+            choices=unique(volcano$evidence_category), 
+            selected = "Eruption Observed",
+            options = list(`actions-box` = TRUE),
+            multiple = T)
+
+
+pickerInput("tectonic","Tectonic Settings", 
+            choices=unique(volcano$tectonic_settings), 
+            selected = c("Subduction zone / Continental crust (>25 km)",
+                         "Intraplate / Continental crust (>25 km)",
+                         "Rift zone / Continental crust (>25 km)"),
+            options = list(`actions-box` = TRUE),
+            multiple = T)
+
+pickerInput("major_rock","Major Rock", 
+            choices=unique(volcano$major_rock_1), 
+            selected = c("Andesite / Basaltic Andesite",
+                         "Basalt / Picro-Basalt",
+                         "Dacite"),
+            options = list(`actions-box` = TRUE),
+            multiple = T)
+
+```
+
+
+Column 4 {.tabset}
+-------------------------------------
+
+### Map of volcanoes 
+
+```{r mp2}
+library(leaflet)
+library(glue)
+library(htmlwidgets)
+library(DT)
+
+template <- "<>{ volcano_name }</p><p>{ primary_volcano_type }</p>"
+
+renderLeaflet({
+  volcano %>%
+        filter(
+      evidence_category %in% input$evidence,
+      tectonic_settings %in% input$tectonic,
+      major_rock_1 %in% input$major_rock
+    ) %>% 
+  mutate(transformed_pop = log2(population_within_5_km + 1),
+         pop_color = colorNumeric(c("blue", "red"), transformed_pop)(transformed_pop)) %>%
+  gather(key, value,
+         volcano_name, primary_volcano_type, last_eruption_year,
+         country,
+         tectonic_settings,
+         population_within_5_km) %>%
+  mutate(key = str_to_title(str_replace_all(key, "_", " ")),
+         key = paste0("<b>", key, "</b>")) %>%
+  replace_na(list(value = "Unknown")) %>%
+  nest(data = c(key, value)) %>%
+  mutate(html = map(data,
+                    knitr::kable,
+                    format = "html",
+                    escape = FALSE,
+                    col.names = c("", ""))) %>%
+  leaflet() %>%
+  addTiles() %>%
+  addCircleMarkers(lat = ~ latitude,
+                   lng = ~ longitude,
+                   color = ~ pop_color,
+                   popup = ~ html,
+                   radius = 1) %>%
+  addMeasure()
+  
+})
+
+```
+
+### Map 2
+
+```{r desc, echo=FALSE, message=FALSE, warning=FALSE}
+library(ggthemes)
+
+renderPlotly({
+  volcano %>%
+    filter(
+      evidence_category %in% input$evidence,
+      tectonic_settings %in% input$tectonic,
+      major_rock_1 %in% input$major_rock
+    )%>%
+  mutate(primary_volcano_type = str_remove(primary_volcano_type, "\\(.*\\)"),
+         primary_volcano_type = fct_lump(primary_volcano_type, 6)) %>%
+  ggplot(aes(longitude, latitude)) +
+  borders() +
+  geom_point(aes(color = primary_volcano_type), size = .5) +
+  theme_map() +
+  labs(title = "",
+       color = "Type")
+  
+  
+})
+```
+
+
+### Data
+
+```{r example 2, echo=F, message=F, warning=F}
+renderPlot({
+  volcano %>%
+        filter(
+      evidence_category %in% input$evidence,
+      tectonic_settings %in% input$tectonic,
+      major_rock_1 %in% input$major_rock
+    ) %>% 
+  mutate(years_ago = 2020 - last_eruption_year) %>%
+  ggplot(aes(years_ago + 1, fill = evidence_category)) +
+  geom_histogram() +
+  scale_x_log10()
+  
+  
+})
+
+
+```
+
+
+

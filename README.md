@@ -1,3 +1,3 @@
 # volcanoes
 
-Please checK:  https://volcanoes.shinyapps.io/volcano/
+Please check:  https://volcanoes.shinyapps.io/volcano/

@@ -36,18 +36,16 @@ Original repository: [data-screencasts](https://github.com/dgrtwo/data-screencas
 <br>
 <br>
 Modified repository:
-[volcano repository](https://bitbucket.roche.com/stash/projects/BIIS_AA/repos/validated-error-model/)
+[volcano repository](https://github.com/matmusta/volcanoes.git)
 </font>
 
 
 ```{r select 1}
-
 pickerInput("evidence","Evidence", 
             choices=unique(volcano$evidence_category), 
             selected = "Eruption Observed",
             options = list(`actions-box` = TRUE),
             multiple = T)
-
 
 pickerInput("tectonic","Tectonic Settings", 
             choices=unique(volcano$tectonic_settings), 

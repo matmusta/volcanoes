@@ -1,6 +1,12 @@
 # volcanoes
 
-Please check:  https://mamut.shinyapps.io/volcanoes/
+Output:  https://mamut.shinyapps.io/volcanoes/
 
-Use: rsconnect::deployApp('C:/Users/stachom3/Desktop/projekty/volcano/volcanoes/volcanoes.Rmd')
-to update
+To connect use:
+rsconnect::setAccountInfo(name='project',
+			  token='<YOUR TOKEN>',
+			  secret='<YOUR SECRET>')
+  
+To update use: 
+rsconnect::deployApp('vol.Rmd')
+

@@ -1,0 +1,10 @@
+name: volcano_local
+title:
+username:
+account: volcanoes
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 2765140
+bundleId: 3602870
+url: https://volcanoes.shinyapps.io/volcano_local/
+when: 1599494146.43856
